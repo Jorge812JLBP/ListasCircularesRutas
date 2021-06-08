@@ -26,9 +26,8 @@ function capturar()
         this.minutos=minutos;
         this.info=function()
         {
-           return "div" + "<h4>" +"Listado de rutas" + "</h4>" + "<br>" + " La ruta " + this.numeroRuta +
-            "<br>" + " De base en " + this.nombreBase + "<br>" + " Hace " + this.minutos + 
-            " para llegar a su destino";
+           return " La ruta " + this.numeroRuta + " <br> " + " de base " + this.nombreBase + " <br> " + " hace " + this.minutos + 
+           " minutos para llegar a su destino " + "<br>" +"----------------------------------------" + "<br>";
         }
         this.siguiente=null;
     }
@@ -52,19 +51,32 @@ function capturar()
 
 
 this.inicio=null;
+let t=null;
 function agregar()
 {
     
    if (this.inicio==null)
-        this.inicio=nuevaRuta;
-      else
+   
+   {
+    this.inicio=nuevaRuta;
+    this.inicio.siguiente=this.inicio;
+    t=nuevaRuta;
+   }
+    else
       {
-        let t=this.inicio
-        while(t.siguiente!=null)
-        {
-          t=t.siguiente; 
-        }                
-        t.siguiente=nuevaRuta;
+          if(t==this.inicio)
+          {
+              t=nuevaRuta;
+              this.inicio.siguiente=t;
+              t.siguiente=this.inicio;
+          }
+          else
+          {
+              t.siguiente=nuevaRuta;
+              nuevaRuta.siguiente=this.inicio;
+              t=nuevaRuta;
+          }
+        
       }
 }
 
@@ -76,24 +88,37 @@ function agregar()
 function imprimir()
 {
     let res="";
-    let t=this.inicio;
-    while(t!=null)
+    
+    if(this.inicio!=null)
     {
-      res +=" La ruta " + t.numeroRuta + " <br> " + " de base " + t.nombreBase + " <br> " + " hace " + t.minutos + 
-      " minutos para llegar a su destino " + "<br>" +"----------------------------------------" + "<br>";
-      t=t.siguiente;
+        res=imprimirRec(this.inicio);
+        return document.getElementById("ListaRutas").innerHTML= res;
     }
-      return document.getElementById("ListaRutas").innerHTML=res;
+
+
+    function imprimirRec(nodo)
+    {
+        if(nodo.siguiente==this.inicio)
+        {
+            return nodo.info();
+        }
+        else
+        {
+            return nodo.info()+imprimirRec(nodo.siguiente);
+        }
+    }
 }
 
 
 
 
 
-function buscar(busquedaruta)
+
+
+function buscar(busquedaBase)
 {
 let t=this.inicio;
-while(t!=null && t.numeroRuta!=busquedaruta)
+while(t!=null && t.nombreBase!=busquedaBase)
 {
     t=t.siguiente;
 }
@@ -106,27 +131,47 @@ return document.getElementById("busruta").innerHTML= "  --> Numero de ruta: " + 
 
 
 
-function eliminar(eliminarruta)
+function eliminar(eliminarBase)
 {
-    if(this.inicio!=null)
+    let vacio="";
+    if(vacio==eliminarBase)
     {
-        if(this.inicio.numeroRuta==eliminarruta)
+        return false;
+    }
+    else
+    {
+        let t= this.inicio;
+        while(t.nombreBase!=eliminarBase || t!=t.siguiente)
         {
-            this.inicio=this.inicio.siguiente;
-        }
-        else
-        {
-            let t= this.inicio;
-            while(t.siguiente!=null)
+            if(t.nombreBase==eliminarBase && t==this.inicio)
             {
-                if(t.siguiente.numeroRuta==eliminarruta)
+                
+                this.inicio=t.siguiente;
+                t=this.inicio;
+                t.anterior.siguiente=this.inicio;
+                return true;
+            }
+            else
+            {
+                if(t.nombreBase==eliminarBase)
                 {
-                    t.siguiente=t.siguiente.siguiente;
+                    t.anterior.siguiente=t.siguiente;
                     return true;
                 }
                 else
                 {
-                    t=t.siguiente;
+                    if(this.inicio==t.siguiente)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        if(t.nombreBase!=eliminarBase)
+                        {
+                            t=t.siguiente;
+                        
+                        }
+                    }
                 }
             }
         }
